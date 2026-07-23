@@ -39,7 +39,7 @@ public class Invest500RuleSet implements RecommendationRuleSet {
 
         long savingDeposits = recommendationRepository.getTransactionAmount(
                 userId,
-                "SEVING",
+                "SAVING",
                 "DEPOSIT"
         );
         boolean recommendationMatches = hasDebit && !hasInvest && savingDeposits > 1000;
