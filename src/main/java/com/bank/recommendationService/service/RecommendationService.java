@@ -17,22 +17,37 @@ import java.util.UUID;
 public class RecommendationService {
 
     private final List<RecommendationRuleSet> ruleSets;
+
     private final DynamicRuleRepository dynamicRuleRepository;
+
     private final DynamicRuleEvaluator dynamicRuleEvaluator;
+
+    private final RuleStatisticsService ruleStatisticsService;
 
     public RecommendationService(
             List<RecommendationRuleSet> ruleSets,
             DynamicRuleRepository dynamicRuleRepository,
-            DynamicRuleEvaluator dynamicRuleEvaluator
+            DynamicRuleEvaluator dynamicRuleEvaluator,
+            RuleStatisticsService ruleStatisticsService
     ) {
         this.ruleSets = ruleSets;
-        this.dynamicRuleRepository = dynamicRuleRepository;
-        this.dynamicRuleEvaluator = dynamicRuleEvaluator;
+
+        this.dynamicRuleRepository =
+                dynamicRuleRepository;
+
+        this.dynamicRuleEvaluator =
+                dynamicRuleEvaluator;
+
+        this.ruleStatisticsService =
+                ruleStatisticsService;
     }
 
-    @Transactional(readOnly = true)
-    public List<Recommendation> getRecommendation(UUID userId) {
-        List<Recommendation> recommendations = new ArrayList<>();
+    @Transactional
+    public List<Recommendation> getRecommendation(
+            UUID userId
+    ) {
+        List<Recommendation> recommendations =
+                new ArrayList<>();
 
         recommendations.addAll(
                 getFixedRecommendations(userId)
@@ -49,31 +64,54 @@ public class RecommendationService {
             UUID userId
     ) {
         return ruleSets.stream()
-                .map(ruleSet -> ruleSet.check(userId))
-                .flatMap(optional -> optional.stream())
+                .map(ruleSet ->
+                        ruleSet.check(userId)
+                )
+                .flatMap(optional ->
+                        optional.stream()
+                )
                 .toList();
     }
 
     private List<Recommendation> getDynamicRecommendations(
             UUID userId
     ) {
-        return dynamicRuleRepository.findAll()
-                .stream()
-                .filter(rule -> matchesRule(userId, rule))
-                .map(this::convertToRecommendation)
-                .toList();
+        List<Recommendation> recommendations =
+                new ArrayList<>();
+
+        List<DynamicRuleEntity> dynamicRules =
+                dynamicRuleRepository.findAll();
+
+        for (DynamicRuleEntity rule : dynamicRules) {
+            boolean matches =
+                    matchesRule(userId, rule);
+
+            if (matches) {
+
+                ruleStatisticsService.incrementCount(
+                        rule.getId()
+                );
+
+                recommendations.add(
+                        convertToRecommendation(rule)
+                );
+            }
+        }
+
+        return recommendations;
     }
 
     private boolean matchesRule(
             UUID userId,
             DynamicRuleEntity rule
     ) {
+
         return rule.getRuleQueries()
                 .stream()
-                .allMatch(query ->
+                .allMatch(ruleQuery ->
                         dynamicRuleEvaluator.evaluate(
                                 userId,
-                                query
+                                ruleQuery
                         )
                 );
     }
@@ -94,7 +132,9 @@ public class RecommendationService {
         Map<UUID, Recommendation> uniqueRecommendations =
                 new LinkedHashMap<>();
 
-        for (Recommendation recommendation : recommendations) {
+        for (Recommendation recommendation :
+                recommendations) {
+
             uniqueRecommendations.putIfAbsent(
                     recommendation.getId(),
                     recommendation

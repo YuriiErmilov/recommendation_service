@@ -4,3 +4,7 @@ databaseChangeLog:
 
   - include:
       file: db/changelog/002-create-rule-query-and-argument.yaml
+
+
+  - include:
+      file: db/changelog/lesson-final-rule-statistics.yaml

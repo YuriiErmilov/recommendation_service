@@ -18,36 +18,61 @@ import java.util.List;
 public class DynamicRuleService {
 
     private final DynamicRuleRepository dynamicRuleRepository;
+    private final RuleStatisticsService ruleStatisticsService;
 
     public DynamicRuleService(
-            DynamicRuleRepository dynamicRuleRepository
+            DynamicRuleRepository dynamicRuleRepository,
+            RuleStatisticsService ruleStatisticsService
     ) {
-        this.dynamicRuleRepository = dynamicRuleRepository;
+        this.dynamicRuleRepository =
+                dynamicRuleRepository;
+
+        this.ruleStatisticsService =
+                ruleStatisticsService;
     }
 
     @Transactional
     public DynamicRuleResponse createRule(
             DynamicRuleRequest request
     ) {
-        DynamicRuleEntity dynamicRule = new DynamicRuleEntity();
+        DynamicRuleEntity dynamicRule =
+                new DynamicRuleEntity();
 
-        dynamicRule.setProductName(request.getProductName());
-        dynamicRule.setProductId(request.getProductId());
-        dynamicRule.setProductText(request.getProductText());
+        dynamicRule.setProductName(
+                request.getProductName()
+        );
+
+        dynamicRule.setProductId(
+                request.getProductId()
+        );
+
+        dynamicRule.setProductText(
+                request.getProductText()
+        );
 
         for (RuleQueryDto queryDto : request.getRule()) {
-            RuleQueryEntity ruleQuery = new RuleQueryEntity();
+            RuleQueryEntity ruleQuery =
+                    new RuleQueryEntity();
 
-            ruleQuery.setQuery(queryDto.getQuery());
-            ruleQuery.setNegate(queryDto.isNegate());
+            ruleQuery.setQuery(
+                    queryDto.getQuery()
+            );
 
-            List<String> arguments = queryDto.getArguments();
+            ruleQuery.setNegate(
+                    queryDto.isNegate()
+            );
+
+            List<String> arguments =
+                    queryDto.getArguments();
 
             for (int i = 0; i < arguments.size(); i++) {
                 RuleArgumentEntity argument =
                         new RuleArgumentEntity();
 
-                argument.setValue(arguments.get(i));
+                argument.setValue(
+                        arguments.get(i)
+                );
+
                 argument.setOrderIndex(i);
 
                 ruleQuery.addArgument(argument);
@@ -58,6 +83,10 @@ public class DynamicRuleService {
 
         DynamicRuleEntity savedRule =
                 dynamicRuleRepository.save(dynamicRule);
+
+        ruleStatisticsService.createStatistics(
+                savedRule.getId()
+        );
 
         return convertToResponse(savedRule);
     }
@@ -74,7 +103,9 @@ public class DynamicRuleService {
     public void deleteRule(Long id) {
         if (!dynamicRuleRepository.existsById(id)) {
             throw new EntityNotFoundException(
-                    "Динамическое правило с id " + id + " не найдено"
+                    "Динамическое правило с id "
+                            + id
+                            + " не найдено"
             );
         }
 
@@ -84,19 +115,24 @@ public class DynamicRuleService {
     private DynamicRuleResponse convertToResponse(
             DynamicRuleEntity entity
     ) {
-        List<RuleQueryDto> queries = new ArrayList<>();
+        List<RuleQueryDto> queries =
+                new ArrayList<>();
 
-        for (RuleQueryEntity queryEntity : entity.getRuleQueries()) {
-            List<String> arguments = queryEntity.getArguments()
-                    .stream()
-                    .map(RuleArgumentEntity::getValue)
-                    .toList();
+        for (RuleQueryEntity queryEntity :
+                entity.getRuleQueries()) {
 
-            RuleQueryDto queryDto = new RuleQueryDto(
-                    queryEntity.getQuery(),
-                    arguments,
-                    queryEntity.isNegate()
-            );
+            List<String> arguments =
+                    queryEntity.getArguments()
+                            .stream()
+                            .map(RuleArgumentEntity::getValue)
+                            .toList();
+
+            RuleQueryDto queryDto =
+                    new RuleQueryDto(
+                            queryEntity.getQuery(),
+                            arguments,
+                            queryEntity.isNegate()
+                    );
 
             queries.add(queryDto);
         }

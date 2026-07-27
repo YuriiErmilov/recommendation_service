@@ -153,4 +153,11 @@ public class RecommendationRepository {
             String transactionType
     ) {
     }
+
+    public void clearCaches() {
+        productTypeCache.invalidateAll();
+        transactionCountCache.invalidateAll();
+        transactionAmountCache.invalidateAll();
+    }
+
 }

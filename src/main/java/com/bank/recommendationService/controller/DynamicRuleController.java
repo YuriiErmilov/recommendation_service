@@ -3,7 +3,9 @@ package com.bank.recommendationService.controller;
 import com.bank.recommendationService.dto.DynamicRuleListResponse;
 import com.bank.recommendationService.dto.DynamicRuleRequest;
 import com.bank.recommendationService.dto.DynamicRuleResponse;
+import com.bank.recommendationService.dto.RuleStatisticsResponse;
 import com.bank.recommendationService.service.DynamicRuleService;
+import com.bank.recommendationService.service.RuleStatisticsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +15,17 @@ public class DynamicRuleController {
 
     private final DynamicRuleService dynamicRuleService;
 
+    private final RuleStatisticsService ruleStatisticsService;
+
     public DynamicRuleController(
-            DynamicRuleService dynamicRuleService
+            DynamicRuleService dynamicRuleService,
+            RuleStatisticsService ruleStatisticsService
     ) {
-        this.dynamicRuleService = dynamicRuleService;
+        this.dynamicRuleService =
+                dynamicRuleService;
+
+        this.ruleStatisticsService =
+                ruleStatisticsService;
     }
 
     @PostMapping
@@ -34,6 +43,16 @@ public class DynamicRuleController {
         DynamicRuleListResponse response =
                 new DynamicRuleListResponse(
                         dynamicRuleService.getAllRules()
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<RuleStatisticsResponse> getStatistics() {
+        RuleStatisticsResponse response =
+                new RuleStatisticsResponse(
+                        ruleStatisticsService.getAllStatistics()
                 );
 
         return ResponseEntity.ok(response);
