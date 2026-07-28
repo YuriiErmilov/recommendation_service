@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -158,6 +160,22 @@ public class RecommendationRepository {
         productTypeCache.invalidateAll();
         transactionCountCache.invalidateAll();
         transactionAmountCache.invalidateAll();
+    }
+    public Optional<UUID> findUserIdByUsername(String username) {
+        String sql = """
+            SELECT id
+            FROM users
+            WHERE LOWER(username) = LOWER(?)
+            """;
+
+        List<UUID> userIds = jdbcTemplate.query(
+                sql,
+                (resultSet, rowNum) ->
+                        resultSet.getObject("id", UUID.class),
+                username
+        );
+
+        return userIds.stream().findFirst();
     }
 
 }
