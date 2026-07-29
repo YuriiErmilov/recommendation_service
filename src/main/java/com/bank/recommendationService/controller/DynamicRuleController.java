@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * REST-контроллер управления динамическими правилами.
@@ -83,7 +83,7 @@ public class DynamicRuleController {
     @PostMapping
     public ResponseEntity<DynamicRuleResponse> createRule(
 
-            @RequestBody(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
                     description = "Данные продукта и список условий правила",
                     content = @Content(
@@ -91,38 +91,36 @@ public class DynamicRuleController {
                             schema = @Schema(
                                     implementation = DynamicRuleRequest.class
                             ),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Правило для активного пользователя DEBIT",
-                                            summary = "Пример динамического правила",
-                                            value = """
-                                                {
-                                                  "product_name": "Premium Debit Card",
-                                                  "product_id": "11111111-1111-1111-1111-111111111111",
-                                                  "product_text": "Оформите премиальную дебетовую карту.",
-                                                  "rule": [
-                                                    {
-                                                      "query": "USER_OF",
-                                                      "arguments": [
-                                                        "DEBIT"
-                                                      ],
-                                                      "negate": false
-                                                    },
-                                                    {
-                                                      "query": "ACTIVE_USER_OF",
-                                                      "arguments": [
-                                                        "DEBIT"
-                                                      ],
-                                                      "negate": false
-                                                    }
-                                                  ]
-                                                }
-                                                """
-                                    )
-                            }
+                            examples = @ExampleObject(
+                                    name = "Правило для активного пользователя DEBIT",
+                                    summary = "Пример динамического правила",
+                                    value = """
+                                        {
+                                          "product_name": "Premium Debit Card",
+                                          "product_id": "11111111-1111-1111-1111-111111111111",
+                                          "product_text": "Оформите премиальную дебетовую карту.",
+                                          "rule": [
+                                            {
+                                              "query": "USER_OF",
+                                              "arguments": [
+                                                "DEBIT"
+                                              ],
+                                              "negate": false
+                                            },
+                                            {
+                                              "query": "ACTIVE_USER_OF",
+                                              "arguments": [
+                                                "DEBIT"
+                                              ],
+                                              "negate": false
+                                            }
+                                          ]
+                                        }
+                                        """
+                            )
                     )
             )
-            DynamicRuleRequest request
+            @RequestBody DynamicRuleRequest request
     ) {
         DynamicRuleResponse response =
                 dynamicRuleService.createRule(request);
