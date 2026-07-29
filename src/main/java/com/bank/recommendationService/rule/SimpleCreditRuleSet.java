@@ -9,26 +9,26 @@ import java.util.UUID;
 
 @Component
 public class SimpleCreditRuleSet implements RecommendationRuleSet {
-    private static final UUID RECOMMENDATION_ID = UUID. fromString("ab138afb-f3ba-4a93-b74f-0fcee86d447f") ;
+    private static final UUID RECOMMENDATION_ID = UUID.fromString("ab138afb-f3ba-4a93-b74f-0fcee86d447f");
     private static final String RECOMMENDATION_NAME = "Простой кредит";
     private static final String RECOMMENDATION_TEXT =
             """
-            Откройте мир выгодных кредитов с нами!
+                    Откройте мир выгодных кредитов с нами!
                     
-            Ищете способ быстро и без лишних хлопот получить нужную сумму? Тогда наш выгодный кредит — именно то, что вам нужно! Мы предлагаем низкие процентные ставки, гибкие условия и индивидуальный подход к каждому клиенту.
+                    Ищете способ быстро и без лишних хлопот получить нужную сумму? Тогда наш выгодный кредит — именно то, что вам нужно! Мы предлагаем низкие процентные ставки, гибкие условия и индивидуальный подход к каждому клиенту.
                     
-            Почему выбирают нас:
+                    Почему выбирают нас:
                     
-            Быстрое рассмотрение заявки. Мы ценим ваше время, поэтому процесс рассмотрения заявки занимает всего несколько часов.
+                    Быстрое рассмотрение заявки. Мы ценим ваше время, поэтому процесс рассмотрения заявки занимает всего несколько часов.
                     
-            Удобное оформление. Подать заявку на кредит можно онлайн на нашем сайте или в мобильном приложении.
+                    Удобное оформление. Подать заявку на кредит можно онлайн на нашем сайте или в мобильном приложении.
                     
-            Широкий выбор кредитных продуктов. Мы предлагаем кредиты на различные цели: покупку недвижимости, автомобиля, образование, лечение и многое другое.
+                    Широкий выбор кредитных продуктов. Мы предлагаем кредиты на различные цели: покупку недвижимости, автомобиля, образование, лечение и многое другое.
                     
-            Не упустите возможность воспользоваться выгодными условиями кредитования от нашей компании!
-            """;
+                    Не упустите возможность воспользоваться выгодными условиями кредитования от нашей компании!
+                    """;
 
-    private final RecommendationRepository  recommendationRepository;
+    private final RecommendationRepository recommendationRepository;
 
     public SimpleCreditRuleSet(RecommendationRepository recommendationRepository) {
         this.recommendationRepository = recommendationRepository;
@@ -42,7 +42,7 @@ public class SimpleCreditRuleSet implements RecommendationRuleSet {
                 "DEBIT",
                 "DEPOSIT"
         );
-        long debitWithdrawals =  recommendationRepository.getTransactionAmount(
+        long debitWithdrawals = recommendationRepository.getTransactionAmount(
                 userId,
                 "DEBIT",
                 "WITHDRAW"
@@ -62,7 +62,7 @@ public class SimpleCreditRuleSet implements RecommendationRuleSet {
                 RECOMMENDATION_NAME,
                 RECOMMENDATION_TEXT
         );
-        return   Optional.of(recommendation);
+        return Optional.of(recommendation);
     }
 
 

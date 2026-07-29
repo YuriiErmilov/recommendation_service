@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-dynamic-rule
+      author: yurii
+
+      changes:
+        - createTable:
+            tableName: dynamic_rule
+
+            columns:
+
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: product_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: product_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: product_text
+                  type: VARCHAR(4000)
+                  constraints:
+                    nullable: false

@@ -1,0 +1,92 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-rule-query-and-argument
+      author: yurii
+
+      changes:
+        - createTable:
+            tableName: rule_query
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: query_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: negate
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: dynamic_rule_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: rule_query
+            baseColumnNames: dynamic_rule_id
+            referencedTableName: dynamic_rule
+            referencedColumnNames: id
+            constraintName: fk_rule_query_dynamic_rule
+            onDelete: CASCADE
+
+        - createTable:
+            tableName: rule_argument
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: argument_value
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: argument_order
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: rule_query_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: rule_argument
+            baseColumnNames: rule_query_id
+            referencedTableName: rule_query
+            referencedColumnNames: id
+            constraintName: fk_rule_argument_rule_query
+            onDelete: CASCADE
+
+        - createIndex:
+            tableName: rule_query
+            indexName: idx_rule_query_dynamic_rule_id
+            columns:
+              - column:
+                  name: dynamic_rule_id
+
+        - createIndex:
+            tableName: rule_argument
+            indexName: idx_rule_argument_rule_query_id
+            columns:
+              - column:
+                  name: rule_query_id

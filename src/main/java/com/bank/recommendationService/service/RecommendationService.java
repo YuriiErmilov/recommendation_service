@@ -1,23 +1,163 @@
 package com.bank.recommendationService.service;
 
 import com.bank.recommendationService.dto.Recommendation;
+import com.bank.recommendationService.entity.DynamicRuleEntity;
+import com.bank.recommendationService.repository.DynamicRuleRepository;
 import com.bank.recommendationService.rule.RecommendationRuleSet;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+/**
+ * Сервис формирования банковских рекомендаций.
+ * <p>
+ * Объединяет результаты статических и динамических правил,
+ * увеличивает статистику сработавших динамических правил
+ * и удаляет дублирующиеся рекомендации.
+ */
 @Service
 public class RecommendationService {
 
     private final List<RecommendationRuleSet> ruleSets;
 
-    public RecommendationService(List<RecommendationRuleSet> ruleSets) {
+    private final DynamicRuleRepository dynamicRuleRepository;
+
+    private final DynamicRuleEvaluator dynamicRuleEvaluator;
+
+    private final RuleStatisticsService ruleStatisticsService;
+
+    public RecommendationService(
+            List<RecommendationRuleSet> ruleSets,
+            DynamicRuleRepository dynamicRuleRepository,
+            DynamicRuleEvaluator dynamicRuleEvaluator,
+            RuleStatisticsService ruleStatisticsService
+    ) {
         this.ruleSets = ruleSets;
+
+        this.dynamicRuleRepository =
+                dynamicRuleRepository;
+
+        this.dynamicRuleEvaluator =
+                dynamicRuleEvaluator;
+
+        this.ruleStatisticsService =
+                ruleStatisticsService;
     }
 
-    public List<Recommendation> getRecommendation(UUID userId) {
-        return ruleSets.stream().map(ruleSets -> ruleSets.check(userId))
-                .flatMap(optional -> optional.stream()).toList();
+    /**
+     * Формирует список банковских рекомендаций для пользователя.
+     * <p>
+     * Сначала выполняются статические правила из первого технического
+     * задания, затем динамические правила из базы данных. Рекомендации
+     * с одинаковым идентификатором продукта удаляются из результата.
+     *
+     * @param userId идентификатор пользователя
+     * @return список подходящих пользователю рекомендаций
+     */
+
+
+    @Transactional
+    public List<Recommendation> getRecommendation(
+            UUID userId
+    ) {
+        List<Recommendation> recommendations =
+                new ArrayList<>();
+
+        recommendations.addAll(
+                getFixedRecommendations(userId)
+        );
+
+        recommendations.addAll(
+                getDynamicRecommendations(userId)
+        );
+
+        return removeDuplicates(recommendations);
+    }
+
+    private List<Recommendation> getFixedRecommendations(
+            UUID userId
+    ) {
+        return ruleSets.stream()
+                .map(ruleSet ->
+                        ruleSet.check(userId)
+                )
+                .flatMap(optional ->
+                        optional.stream()
+                )
+                .toList();
+    }
+
+    private List<Recommendation> getDynamicRecommendations(
+            UUID userId
+    ) {
+        List<Recommendation> recommendations =
+                new ArrayList<>();
+
+        List<DynamicRuleEntity> dynamicRules =
+                dynamicRuleRepository.findAll();
+
+        for (DynamicRuleEntity rule : dynamicRules) {
+            boolean matches =
+                    matchesRule(userId, rule);
+
+            if (matches) {
+
+                ruleStatisticsService.incrementCount(
+                        rule.getId()
+                );
+
+                recommendations.add(
+                        convertToRecommendation(rule)
+                );
+            }
+        }
+
+        return recommendations;
+    }
+
+    private boolean matchesRule(
+            UUID userId,
+            DynamicRuleEntity rule
+    ) {
+
+        return rule.getRuleQueries()
+                .stream()
+                .allMatch(ruleQuery ->
+                        dynamicRuleEvaluator.evaluate(
+                                userId,
+                                ruleQuery
+                        )
+                );
+    }
+
+    private Recommendation convertToRecommendation(
+            DynamicRuleEntity rule
+    ) {
+        return new Recommendation(
+                rule.getProductId(),
+                rule.getProductName(),
+                rule.getProductText()
+        );
+    }
+
+    private List<Recommendation> removeDuplicates(
+            List<Recommendation> recommendations
+    ) {
+        Map<UUID, Recommendation> uniqueRecommendations =
+                new LinkedHashMap<>();
+
+        for (Recommendation recommendation :
+                recommendations) {
+
+            uniqueRecommendations.putIfAbsent(
+                    recommendation.id(),
+                    recommendation
+            );
+        }
+
+        return new ArrayList<>(
+                uniqueRecommendations.values()
+        );
     }
 }

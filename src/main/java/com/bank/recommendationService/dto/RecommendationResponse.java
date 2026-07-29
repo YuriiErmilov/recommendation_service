@@ -1,21 +1,20 @@
 package com.bank.recommendationService.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.List;
 import java.util.UUID;
 
-public class RecommendationResponse {
-    private final UUID user_id;
-    private final List<Recommendation> recommendations;
+@Schema(description = "Ответ с рекомендациями пользователя")
+public record RecommendationResponse(
 
-    public RecommendationResponse(UUID user_id, List<Recommendation> recommendations) {
-        this.user_id = user_id;
-        this.recommendations = recommendations;
-    }
-    public UUID getUser_id() {
-        return user_id;
-    }
-    public List<Recommendation> getRecommendations() {
-        return recommendations;
-    }
+        @Schema(
+                description = "UUID пользователя",
+                example = "cd515076-5d8a-44be-930e-8d4fcb79f42d"
+        )
+        UUID user_id,
 
+        @Schema(description = "Список рекомендаций")
+        List<Recommendation> recommendations
+) {
 }

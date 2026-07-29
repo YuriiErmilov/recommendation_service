@@ -2,7 +2,6 @@ package com.bank.recommendationService.rule;
 
 import com.bank.recommendationService.dto.Recommendation;
 import com.bank.recommendationService.recommendationRepository.RecommendationRepository;
-import com.bank.recommendationService.service.RecommendationService;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -17,15 +16,15 @@ public class Invest500RuleSet implements RecommendationRuleSet {
 
     private static final String RECOMMENDATION_TEXT =
             """
-             Откройте свой путь к успеху с индивидуальным инвестиционным счетом (ИИС) от нашего банка! \\
-             Воспользуйтесь налоговыми льготами и начните инвестировать с умом. \\
-             Пополните счет до конца года и получите выгоду в виде вычета на взнос \\
-             в следующем налоговом периоде. Не упустите возможность разнообразить свой портфель, \\
-             снизить риски и следить за актуальными рыночными тенденциями. \\
-             Откройте ИИС сегодня и станьте ближе к финансовой независимости!    
+                    Откройте свой путь к успеху с индивидуальным инвестиционным счетом (ИИС) от нашего банка! \\
+                    Воспользуйтесь налоговыми льготами и начните инвестировать с умом. \\
+                    Пополните счет до конца года и получите выгоду в виде вычета на взнос \\
+                    в следующем налоговом периоде. Не упустите возможность разнообразить свой портфель, \\
+                    снизить риски и следить за актуальными рыночными тенденциями. \\
+                    Откройте ИИС сегодня и станьте ближе к финансовой независимости!    
                     """;
 
-    private final RecommendationRepository  recommendationRepository;
+    private final RecommendationRepository recommendationRepository;
 
     public Invest500RuleSet(RecommendationRepository recommendationRepository) {
         this.recommendationRepository = recommendationRepository;
@@ -39,7 +38,7 @@ public class Invest500RuleSet implements RecommendationRuleSet {
 
         long savingDeposits = recommendationRepository.getTransactionAmount(
                 userId,
-                "SEVING",
+                "SAVING",
                 "DEPOSIT"
         );
         boolean recommendationMatches = hasDebit && !hasInvest && savingDeposits > 1000;
@@ -51,6 +50,6 @@ public class Invest500RuleSet implements RecommendationRuleSet {
                 RECOMMENDATION_NAME,
                 RECOMMENDATION_TEXT);
         return Optional.of(recommendation);
-       }
+    }
 
 }
