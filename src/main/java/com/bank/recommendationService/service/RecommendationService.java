@@ -7,7 +7,11 @@ import com.bank.recommendationService.rule.RecommendationRuleSet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Сервис формирования банковских рекомендаций.
@@ -55,8 +59,6 @@ public class RecommendationService {
      * @param userId идентификатор пользователя
      * @return список подходящих пользователю рекомендаций
      */
-
-
     @Transactional
     public List<Recommendation> getRecommendation(
             UUID userId

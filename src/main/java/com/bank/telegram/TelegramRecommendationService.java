@@ -13,7 +13,6 @@ import java.util.UUID;
  * Сервис получения и форматирования рекомендаций
  * для отправки пользователю Telegram.
  */
-
 @Service
 public class TelegramRecommendationService {
 
@@ -35,7 +34,6 @@ public class TelegramRecommendationService {
      * @param username имя пользователя в базе знаний
      * @return сообщение для отправки в Telegram
      */
-
     public String getRecommendationsByUsername(String username) {
         Optional<UUID> userId =
                 recommendationRepository.findUserIdByUsername(username);
