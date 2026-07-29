@@ -29,6 +29,7 @@ public class RuleArgumentEntity {
         this.value = value;
         this.orderIndex = orderIndex;
     }
+
     public Long getId() {
         return id;
     }
@@ -37,20 +38,20 @@ public class RuleArgumentEntity {
         return value;
     }
 
-    public int getOrderIndex() {
-        return orderIndex;
-    }
-
-    public RuleQueryEntity getRuleQuery() {
-        return ruleQuery;
-    }
-
     public void setValue(String value) {
         this.value = value;
     }
 
+    public int getOrderIndex() {
+        return orderIndex;
+    }
+
     public void setOrderIndex(int orderIndex) {
         this.orderIndex = orderIndex;
+    }
+
+    public RuleQueryEntity getRuleQuery() {
+        return ruleQuery;
     }
 
     public void setRuleQuery(RuleQueryEntity ruleQuery) {

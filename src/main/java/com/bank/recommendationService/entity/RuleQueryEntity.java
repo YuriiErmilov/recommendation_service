@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "rule_query" )
+@Table(name = "rule_query")
 public class RuleQueryEntity {
 
     @Id
@@ -31,7 +31,7 @@ public class RuleQueryEntity {
     )
     @OrderBy("orderIndex ASC")
 
-    private List<RuleArgumentEntity> arguments = new ArrayList<>();
+    private final List<RuleArgumentEntity> arguments = new ArrayList<>();
 
     public RuleQueryEntity() {
     }
@@ -50,6 +50,7 @@ public class RuleQueryEntity {
         this.arguments.remove(argument);
         argument.setRuleQuery(null);
     }
+
     public Long getId() {
         return id;
     }
@@ -58,28 +59,28 @@ public class RuleQueryEntity {
         return query;
     }
 
-    public boolean isNegate() {
-        return negate;
-    }
-
-    public DynamicRuleEntity getDynamicRule() {
-        return dynamicRule;
-    }
-
-    public List<RuleArgumentEntity> getArguments() {
-        return arguments;
-    }
-
     public void setQuery(String query) {
         this.query = query;
+    }
+
+    public boolean isNegate() {
+        return negate;
     }
 
     public void setNegate(boolean negate) {
         this.negate = negate;
     }
 
+    public DynamicRuleEntity getDynamicRule() {
+        return dynamicRule;
+    }
+
     public void setDynamicRule(DynamicRuleEntity dynamicRule) {
         this.dynamicRule = dynamicRule;
+    }
+
+    public List<RuleArgumentEntity> getArguments() {
+        return arguments;
     }
 
 }

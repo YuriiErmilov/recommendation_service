@@ -5,6 +5,13 @@ import com.bank.recommendationService.recommendationRepository.RecommendationRep
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Service;
 
+/**
+ * Сервис технического управления приложением.
+ * <p>
+ * Позволяет очищать кеши базы знаний и получать
+ * информацию о текущей сборке приложения.
+ */
+
 @Service
 public class ManagementService {
 
@@ -22,9 +29,19 @@ public class ManagementService {
                 buildProperties;
     }
 
+    /**
+     * Очищает все кеши репозитория рекомендаций.
+     */
+
     public void clearCaches() {
         recommendationRepository.clearCaches();
     }
+
+    /**
+     * Возвращает название и версию текущей сборки приложения.
+     *
+     * @return информация о сервисе
+     */
 
     public ServiceInfoResponse getServiceInfo() {
         return new ServiceInfoResponse(

@@ -1,27 +1,23 @@
 package com.bank.recommendationService.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-public class RuleStatisticsDto {
+@Schema(description = "Статистика срабатывания динамического правила")
+public record RuleStatisticsDto(
 
-    @JsonProperty("rule_id")
-    private final Long ruleId;
+        @JsonProperty("rule_id")
+        @Schema(
+                description = "Идентификатор динамического правила",
+                example = "5"
+        )
+        Long ruleId,
 
-    private final Long count;
+        @Schema(
+                description = "Количество успешных срабатываний правила",
+                example = "17"
+        )
+        Long count
 
-    public RuleStatisticsDto(
-            Long ruleId,
-            Long count
-    ) {
-        this.ruleId = ruleId;
-        this.count = count;
-    }
-
-    public Long getRuleId() {
-        return ruleId;
-    }
-
-    public Long getCount() {
-        return count;
-    }
+) {
 }

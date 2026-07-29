@@ -14,6 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Сервис управления динамическими правилами рекомендаций.
+ * <p>
+ * Поддерживает создание, получение и удаление динамических правил.
+ * При создании правила также создаётся запись статистики
+ * с начальным значением счётчика 0.
+ */
+
 @Service
 public class DynamicRuleService {
 
@@ -30,6 +38,13 @@ public class DynamicRuleService {
         this.ruleStatisticsService =
                 ruleStatisticsService;
     }
+
+    /**
+     * Создаёт новое динамическое правило рекомендаций.
+     *
+     * @param request данные продукта и набор условий правила
+     * @return созданное динамическое правило
+     */
 
     @Transactional
     public DynamicRuleResponse createRule(
@@ -91,6 +106,12 @@ public class DynamicRuleService {
         return convertToResponse(savedRule);
     }
 
+    /**
+     * Возвращает все динамические правила.
+     *
+     * @return список динамических правил
+     */
+
     @Transactional(readOnly = true)
     public List<DynamicRuleResponse> getAllRules() {
         return dynamicRuleRepository.findAll()
@@ -98,6 +119,15 @@ public class DynamicRuleService {
                 .map(this::convertToResponse)
                 .toList();
     }
+
+    /**
+     * Удаляет динамическое правило по идентификатору.
+     * <p>
+     * Связанная статистика удаляется каскадно на уровне базы данных.
+     *
+     * @param id идентификатор динамического правила
+     * @throws EntityNotFoundException если правило не найдено
+     */
 
     @Transactional
     public void deleteRule(Long id) {

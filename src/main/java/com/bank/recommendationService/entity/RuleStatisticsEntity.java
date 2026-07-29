@@ -42,12 +42,12 @@ public class RuleStatisticsEntity {
         return ruleId;
     }
 
-    public Long getCount() {
-        return count;
-    }
-
     public void setRuleId(Long ruleId) {
         this.ruleId = ruleId;
+    }
+
+    public Long getCount() {
+        return count;
     }
 
     public void setCount(Long count) {

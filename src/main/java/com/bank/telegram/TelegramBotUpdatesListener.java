@@ -13,6 +13,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Обработчик входящих сообщений Telegram-бота.
+ * <p>
+ * Поддерживает команды /start, /help и /recommend username.
+ */
+
 @Component
 public class TelegramBotUpdatesListener implements UpdatesListener {
 
@@ -48,6 +54,13 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         logger.info("Telegram-бот остановлен");
     }
 
+    /**
+     * Обрабатывает полученные от Telegram обновления.
+     *
+     * @param updates список входящих обновлений
+     * @return подтверждение обработки всех обновлений
+     */
+
     @Override
     public int process(List<Update> updates) {
         for (Update update : updates) {
@@ -75,11 +88,31 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         Long chatId = message.chat().id();
         String text = message.text().trim();
 
-        String answer = handleCommand(text);
+        try {
+            String answer = handleCommand(text);
 
-        telegramBot.execute(
-                new SendMessage(chatId, answer)
-        );
+            telegramBot.execute(
+                    new SendMessage(chatId, answer)
+            );
+        } catch (Exception exception) {
+            logger.error(
+                    "Ошибка обработки команды Telegram: {}",
+                    text,
+                    exception
+            );
+
+            telegramBot.execute(
+                    new SendMessage(
+                            chatId,
+                            """
+                                    Не удалось обработать запрос.
+                                    
+                                    Попробуйте повторить команду позже
+                                    или используйте /help.
+                                    """
+                    )
+            );
+        }
     }
 
     private String handleCommand(String text) {
@@ -94,10 +127,10 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         if (text.equals("/recommend")) {
             return """
                     Не указан username.
-
+                    
                     Используйте команду:
                     /recommend username
-
+                    
                     Пример:
                     /recommend ivan
                     """;
@@ -115,7 +148,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             if (username.isBlank()) {
                 return """
                         Не указан username.
-
+                        
                         Используйте команду:
                         /recommend username
                         """;
@@ -127,7 +160,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
         return """
                 Неизвестная команда.
-
+                
                 Для просмотра доступных команд используйте:
                 /help
                 """;
@@ -136,15 +169,15 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private String getWelcomeMessage() {
         return """
                 Привет!
-
+                
                 Я бот сервиса банковских рекомендаций.
-
+                
                 Я помогу получить список банковских продуктов,
                 подходящих конкретному пользователю.
-
+                
                 Используйте команду:
                 /recommend username
-
+                
                 Для просмотра справки:
                 /help
                 """;
@@ -153,14 +186,14 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private String getHelpMessage() {
         return """
                 Доступные команды:
-
+                
                 /start — показать приветствие
-
+                
                 /help — показать справку
-
+                
                 /recommend username —
                 получить рекомендации для пользователя
-
+                
                 Пример:
                 /recommend ivan
                 """;

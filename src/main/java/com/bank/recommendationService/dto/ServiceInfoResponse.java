@@ -1,23 +1,21 @@
 package com.bank.recommendationService.dto;
 
-public class ServiceInfoResponse {
+import io.swagger.v3.oas.annotations.media.Schema;
 
-    private final String name;
-    private final String version;
+@Schema(description = "Информация о текущей сборке приложения")
+public record ServiceInfoResponse(
 
-    public ServiceInfoResponse(
-            String name,
-            String version
-    ) {
-        this.name = name;
-        this.version = version;
-    }
+        @Schema(
+                description = "Название приложения",
+                example = "recommendationService"
+        )
+        String name,
 
-    public String getName() {
-        return name;
-    }
+        @Schema(
+                description = "Версия приложения",
+                example = "0.0.1-SNAPSHOT"
+        )
+        String version
 
-    public String getVersion() {
-        return version;
-    }
+) {
 }

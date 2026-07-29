@@ -8,6 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * Сервис управления статистикой срабатывания динамических правил.
+ */
+
 @Service
 public class RuleStatisticsService {
 
@@ -19,6 +23,14 @@ public class RuleStatisticsService {
         this.ruleStatisticsRepository =
                 ruleStatisticsRepository;
     }
+
+    /**
+     * Создаёт статистику для нового динамического правила.
+     * <p>
+     * Если статистика уже существует, новая запись не создаётся.
+     *
+     * @param ruleId идентификатор динамического правила
+     */
 
     @Transactional
     public void createStatistics(Long ruleId) {
@@ -37,6 +49,15 @@ public class RuleStatisticsService {
         ruleStatisticsRepository.save(statistics);
     }
 
+    /**
+     * Атомарно увеличивает счётчик срабатывания правила.
+     * <p>
+     * Если статистика для правила ещё не существует,
+     * создаётся новая запись со значением 1.
+     *
+     * @param ruleId идентификатор сработавшего правила
+     */
+
     @Transactional
     public void incrementCount(Long ruleId) {
         int updatedRows =
@@ -53,6 +74,12 @@ public class RuleStatisticsService {
             ruleStatisticsRepository.save(statistics);
         }
     }
+
+    /**
+     * Возвращает статистику всех динамических правил.
+     *
+     * @return список идентификаторов правил и количества их срабатываний
+     */
 
     @Transactional(readOnly = true)
     public List<RuleStatisticsDto> getAllStatistics() {

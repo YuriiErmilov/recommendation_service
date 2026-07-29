@@ -1,16 +1,22 @@
 package com.bank.recommendationService.dto;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.List;
 
-public class DynamicRuleListResponse {
+@Schema(description = "Ответ со списком динамических правил")
+public record DynamicRuleListResponse(
 
-    private List<DynamicRuleResponse> data;
+        @ArraySchema(
+                schema = @Schema(
+                        implementation = DynamicRuleResponse.class
+                ),
+                arraySchema = @Schema(
+                        description = "Список зарегистрированных динамических правил"
+                )
+        )
+        List<DynamicRuleResponse> data
 
-    public DynamicRuleListResponse(List<DynamicRuleResponse> data) {
-        this.data = data;
-    }
-
-    public List<DynamicRuleResponse> getData() {
-        return data;
-    }
+) {
 }

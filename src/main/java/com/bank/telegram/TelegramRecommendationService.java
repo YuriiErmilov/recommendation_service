@@ -9,6 +9,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Сервис получения и форматирования рекомендаций
+ * для отправки пользователю Telegram.
+ */
+
 @Service
 public class TelegramRecommendationService {
 
@@ -22,6 +27,14 @@ public class TelegramRecommendationService {
         this.recommendationRepository = recommendationRepository;
         this.recommendationService = recommendationService;
     }
+
+    /**
+     * Возвращает текстовое представление рекомендаций
+     * для пользователя, найденного по username.
+     *
+     * @param username имя пользователя в базе знаний
+     * @return сообщение для отправки в Telegram
+     */
 
     public String getRecommendationsByUsername(String username) {
         Optional<UUID> userId =
@@ -61,9 +74,9 @@ public class TelegramRecommendationService {
 
             result.append(i + 1)
                     .append(". ")
-                    .append(recommendation.getName())
+                    .append(recommendation.name())
                     .append("\n")
-                    .append(recommendation.getText())
+                    .append(recommendation.text())
                     .append("\n\n");
         }
 

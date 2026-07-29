@@ -11,6 +11,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Репозиторий для обращения к базе знаний H2.
+ * <p>
+ * Выполняет запросы к пользователям, продуктам и транзакциям.
+ * Результаты основных запросов кешируются с помощью Caffeine.
+ */
+
 @Repository
 public class RecommendationRepository {
 
@@ -41,6 +48,14 @@ public class RecommendationRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * Проверяет наличие продукта указанного типа у пользователя.
+     *
+     * @param userId      идентификатор пользователя
+     * @param productType тип продукта
+     * @return true, если пользователь использует продукт
+     */
+
     public boolean hasProductType(UUID userId, String productType) {
         ProductKey key = new ProductKey(userId, productType);
 
@@ -53,6 +68,14 @@ public class RecommendationRepository {
         );
     }
 
+    /**
+     * Возвращает количество транзакций пользователя по типу продукта.
+     *
+     * @param userId      идентификатор пользователя
+     * @param productType тип продукта
+     * @return количество транзакций
+     */
+
     public long getTransactionCount(UUID userId, String productType) {
         ProductKey key = new ProductKey(userId, productType);
 
@@ -64,6 +87,15 @@ public class RecommendationRepository {
                 )
         );
     }
+
+    /**
+     * Возвращает общую сумму транзакций указанного типа.
+     *
+     * @param userId          идентификатор пользователя
+     * @param productType     тип банковского продукта
+     * @param transactionType тип транзакции
+     * @return сумма транзакций
+     */
 
     public long getTransactionAmount(
             UUID userId,
@@ -89,12 +121,12 @@ public class RecommendationRepository {
     private boolean loadHasProductType(UUID userId, String productType) {
         Long count = jdbcTemplate.queryForObject(
                 """
-                SELECT COUNT(*)
-                FROM TRANSACTIONS t
-                JOIN PRODUCTS p ON t.PRODUCT_ID = p.ID
-                WHERE t.USER_ID = ?
-                  AND p.TYPE = ?
-                """,
+                        SELECT COUNT(*)
+                        FROM TRANSACTIONS t
+                        JOIN PRODUCTS p ON t.PRODUCT_ID = p.ID
+                        WHERE t.USER_ID = ?
+                          AND p.TYPE = ?
+                        """,
                 Long.class,
                 userId,
                 productType
@@ -106,12 +138,12 @@ public class RecommendationRepository {
     private long loadTransactionCount(UUID userId, String productType) {
         Long count = jdbcTemplate.queryForObject(
                 """
-                SELECT COUNT(*)
-                FROM TRANSACTIONS t
-                JOIN PRODUCTS p ON t.PRODUCT_ID = p.ID
-                WHERE t.USER_ID = ?
-                  AND p.TYPE = ?
-                """,
+                        SELECT COUNT(*)
+                        FROM TRANSACTIONS t
+                        JOIN PRODUCTS p ON t.PRODUCT_ID = p.ID
+                        WHERE t.USER_ID = ?
+                          AND p.TYPE = ?
+                        """,
                 Long.class,
                 userId,
                 productType
@@ -127,13 +159,13 @@ public class RecommendationRepository {
     ) {
         Long amount = jdbcTemplate.queryForObject(
                 """
-                SELECT COALESCE(SUM(t.AMOUNT), 0)
-                FROM TRANSACTIONS t
-                JOIN PRODUCTS p ON t.PRODUCT_ID = p.ID
-                WHERE t.USER_ID = ?
-                  AND p.TYPE = ?
-                  AND t.TYPE = ?
-                """,
+                        SELECT COALESCE(SUM(t.AMOUNT), 0)
+                        FROM TRANSACTIONS t
+                        JOIN PRODUCTS p ON t.PRODUCT_ID = p.ID
+                        WHERE t.USER_ID = ?
+                          AND p.TYPE = ?
+                          AND t.TYPE = ?
+                        """,
                 Long.class,
                 userId,
                 productType,
@@ -141,6 +173,43 @@ public class RecommendationRepository {
         );
 
         return amount == null ? 0 : amount;
+    }
+
+    /**
+     * Очищает кеш наличия продуктов, количества транзакций
+     * и сумм транзакций.
+     */
+
+    public void clearCaches() {
+        productTypeCache.invalidateAll();
+        transactionCountCache.invalidateAll();
+        transactionAmountCache.invalidateAll();
+    }
+
+    /**
+     * Находит идентификатор пользователя по username.
+     * <p>
+     * Поиск выполняется без учёта регистра.
+     *
+     * @param username имя пользователя
+     * @return идентификатор пользователя или пустой Optional
+     */
+
+    public Optional<UUID> findUserIdByUsername(String username) {
+        String sql = """
+                SELECT id
+                FROM users
+                WHERE LOWER(username) = LOWER(?)
+                """;
+
+        List<UUID> userIds = jdbcTemplate.query(
+                sql,
+                (resultSet, rowNum) ->
+                        resultSet.getObject("id", UUID.class),
+                username
+        );
+
+        return userIds.stream().findFirst();
     }
 
     private record ProductKey(
@@ -154,28 +223,6 @@ public class RecommendationRepository {
             String productType,
             String transactionType
     ) {
-    }
-
-    public void clearCaches() {
-        productTypeCache.invalidateAll();
-        transactionCountCache.invalidateAll();
-        transactionAmountCache.invalidateAll();
-    }
-    public Optional<UUID> findUserIdByUsername(String username) {
-        String sql = """
-            SELECT id
-            FROM users
-            WHERE LOWER(username) = LOWER(?)
-            """;
-
-        List<UUID> userIds = jdbcTemplate.query(
-                sql,
-                (resultSet, rowNum) ->
-                        resultSet.getObject("id", UUID.class),
-                username
-        );
-
-        return userIds.stream().findFirst();
     }
 
 }

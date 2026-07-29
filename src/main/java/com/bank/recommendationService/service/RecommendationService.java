@@ -7,12 +7,15 @@ import com.bank.recommendationService.rule.RecommendationRuleSet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+/**
+ * Сервис формирования банковских рекомендаций.
+ * <p>
+ * Объединяет результаты статических и динамических правил,
+ * увеличивает статистику сработавших динамических правил
+ * и удаляет дублирующиеся рекомендации.
+ */
 @Service
 public class RecommendationService {
 
@@ -41,6 +44,18 @@ public class RecommendationService {
         this.ruleStatisticsService =
                 ruleStatisticsService;
     }
+
+    /**
+     * Формирует список банковских рекомендаций для пользователя.
+     * <p>
+     * Сначала выполняются статические правила из первого технического
+     * задания, затем динамические правила из базы данных. Рекомендации
+     * с одинаковым идентификатором продукта удаляются из результата.
+     *
+     * @param userId идентификатор пользователя
+     * @return список подходящих пользователю рекомендаций
+     */
+
 
     @Transactional
     public List<Recommendation> getRecommendation(
@@ -136,7 +151,7 @@ public class RecommendationService {
                 recommendations) {
 
             uniqueRecommendations.putIfAbsent(
-                    recommendation.getId(),
+                    recommendation.id(),
                     recommendation
             );
         }

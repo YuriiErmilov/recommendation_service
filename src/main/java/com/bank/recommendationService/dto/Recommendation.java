@@ -1,26 +1,28 @@
 package com.bank.recommendationService.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.UUID;
 
-public class Recommendation {
-    private final UUID id;
-    private final String name;
-    private final String text;
+@Schema(description = "Банковская рекомендация")
+public record Recommendation(
 
-    public Recommendation(UUID id, String name, String text) {
-        this.id = id;
-        this.name = name;
-        this.text = text;
-    }
+        @Schema(
+                description = "Идентификатор продукта",
+                example = "147f6a0f-3b91-413b-ab99-87f081d60d5a"
+        )
+        UUID id,
 
-    public UUID getId() {
-        return id;
-    }
-    public String getName() {
-        return name;
-    }
-    public String getText() {
-        return text;
-    }
+        @Schema(
+                description = "Название рекомендации",
+                example = "Invest 500"
+        )
+        String name,
 
+        @Schema(
+                description = "Описание рекомендации",
+                example = "Откройте индивидуальный инвестиционный счет..."
+        )
+        String text
+) {
 }

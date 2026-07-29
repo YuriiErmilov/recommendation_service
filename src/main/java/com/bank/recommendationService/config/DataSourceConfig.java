@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
@@ -16,7 +15,7 @@ public class DataSourceConfig {
 
     @Primary
     @Bean(name = "defaultDataSourceProperties")
-   @ConfigurationProperties(prefix = "spring.datasource")
+    @ConfigurationProperties(prefix = "spring.datasource")
     public DataSourceProperties defaultDataSourceProperties() {
         return new DataSourceProperties();
     }

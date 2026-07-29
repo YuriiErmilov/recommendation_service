@@ -8,6 +8,14 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Компонент проверки условий динамических правил.
+ * <p>
+ * Поддерживает проверки наличия продукта, активности пользователя,
+ * сравнения суммы транзакций с константой и сравнения сумм
+ * пополнений и списаний.
+ */
+
 @Component
 public class DynamicRuleEvaluator {
 
@@ -19,6 +27,18 @@ public class DynamicRuleEvaluator {
         this.recommendationRepository = recommendationRepository;
     }
 
+    /**
+     * Проверяет одно условие динамического правила.
+     * <p>
+     * После вычисления основного результата применяется флаг negate.
+     *
+     * @param userId    идентификатор пользователя
+     * @param ruleQuery условие динамического правила
+     * @return true, если условие выполнено
+     * @throws IllegalArgumentException при неизвестном типе запроса,
+     *                                  операторе или неправильных аргументах
+     */
+
     public boolean evaluate(UUID userId, RuleQueryEntity ruleQuery) {
         List<String> arguments = ruleQuery.getArguments()
                 .stream()
@@ -26,24 +46,20 @@ public class DynamicRuleEvaluator {
                 .toList();
 
         boolean result = switch (ruleQuery.getQuery()) {
-            case "USER_OF" ->
-                    evaluateUserOf(userId, arguments);
+            case "USER_OF" -> evaluateUserOf(userId, arguments);
 
-            case "ACTIVE_USER_OF" ->
-                    evaluateActiveUserOf(userId, arguments);
+            case "ACTIVE_USER_OF" -> evaluateActiveUserOf(userId, arguments);
 
-            case "TRANSACTION_SUM_COMPARE" ->
-                    evaluateTransactionSumCompare(userId, arguments);
+            case "TRANSACTION_SUM_COMPARE" -> evaluateTransactionSumCompare(userId, arguments);
 
-            case "TRANSACTION_SUM_COMPARE_DEPOSIT_WITHDRAW" ->
-                    evaluateDepositWithdrawCompare(userId, arguments);
+            case "TRANSACTION_SUM_COMPARE_DEPOSIT_WITHDRAW" -> evaluateDepositWithdrawCompare(userId, arguments);
 
             default -> throw new IllegalArgumentException(
                     "Неизвестный тип запроса: " + ruleQuery.getQuery()
             );
         };
 
-        return ruleQuery.isNegate() ? !result : result;
+        return ruleQuery.isNegate() != result;
     }
 
     private boolean evaluateUserOf(

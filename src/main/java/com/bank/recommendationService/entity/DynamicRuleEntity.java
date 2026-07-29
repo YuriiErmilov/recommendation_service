@@ -29,10 +29,11 @@ public class DynamicRuleEntity {
             orphanRemoval = true
     )
     @OrderBy("id ASC")
-    private List<RuleQueryEntity> ruleQueries = new ArrayList<>();
+    private final List<RuleQueryEntity> ruleQueries = new ArrayList<>();
 
     public DynamicRuleEntity() {
     }
+
     public DynamicRuleEntity(String productName, UUID productId, String productText) {
         this.productName = productName;
         this.productId = productId;
@@ -43,6 +44,7 @@ public class DynamicRuleEntity {
         ruleQueries.add(ruleQuery);
         ruleQuery.setDynamicRule(this);
     }
+
     public void removeRuleQuery(RuleQueryEntity ruleQuery) {
         ruleQueries.remove(ruleQuery);
         ruleQuery.setDynamicRule(null);
@@ -60,20 +62,20 @@ public class DynamicRuleEntity {
         return productName;
     }
 
-    public UUID getProductId() {
-        return productId;
-    }
-
-    public String getProductText() {
-        return productText;
-    }
-
     public void setProductName(String productName) {
         this.productName = productName;
     }
 
+    public UUID getProductId() {
+        return productId;
+    }
+
     public void setProductId(UUID productId) {
         this.productId = productId;
+    }
+
+    public String getProductText() {
+        return productText;
     }
 
     public void setProductText(String productText) {
